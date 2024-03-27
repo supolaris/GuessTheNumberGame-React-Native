@@ -1,45 +1,30 @@
-import { Text, View, ImageBackground, Alert, Keyboard, TouchableWithoutFeedback } from 'react-native';
+import { Text, View, SafeAreaView, ImageBackground } from 'react-native';
 import React, { useState } from 'react';
-import { TextInput } from 'react-native-paper';
-import { MyColors } from '../../components/colors/colors';
+import CustomTitle from '../../components/customTitle/customTitle';
 import { LinearGradient } from 'expo-linear-gradient';
-import CustomButtom from '../../components/customButtom/customButtom';
+import { MyColors } from '../../components/colors/colors';
+import CustomNumber from '../../components/customNumber/customNumber';
 import { GameStyles } from './gameStyles';
+import CustomButtom from '../../components/customButtom/customButtom';
 
-export function GameScreen() {
+export default function GameScreen({ userNumber }) {
 
-    const [enterNumber, setEnterNumber] = useState('');
 
-    function resetInputHandler(){
-        setEnterNumber('');
+
+    function generateRandomNumber(min, max, exlude) {
+
+        const randomNumber = Math.floor(Math.random() * (max - min) + max);
+        if (randomNumber === exlude) {
+            return generateRandomNumber(min, max, exlude)
+        } else {
+            return randomNumber;
+        }
     }
 
-    function numberInputHandler(enteredText){
-        setEnterNumber(enteredText);
-    }
-
-    function confirmInputHandler(){
-        console.log('input');
-        const choosenNumber = parseInt(enterNumber);
-
-        if(isNaN(choosenNumber) || choosenNumber == 0 || choosenNumber > 99 ){
-            Alert.alert(
-                'Invalid number',
-                'Number should be between 1 and 99',
-                [{text: 'Okay', style: 'destructive', onPress: resetInputHandler}]
-            )
-            return;
-        };
-
-        console.log('Valid number');
-
-    }
-
-    
-    
+    const initialGuess = generateRandomNumber(1, 100, userNumber);
+    const [currentGuess, setCurrentGuess] = useState(initialGuess);
 
     return (
-        
         <LinearGradient
             colors={[MyColors.darkGreen, MyColors.lightGreen]}
             style={{ flex: 1 }}
@@ -49,46 +34,24 @@ export function GameScreen() {
                 style={{ opacity: 0.5, flex: 1 }}
                 resizeMode='cover'
             >
-                <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-
                 <View style={GameStyles.container}>
+                    <SafeAreaView >
+                        <CustomTitle>Opponent's Guess</CustomTitle>
+                        <CustomNumber>{currentGuess}</CustomNumber>
 
-                    <View style={GameStyles.inputButtonView}>
-                        
-                        <TextInput
-                                style={GameStyles.textInput}
-                                maxLength={2}
-                                keyboardType='number-pad'
-                                //mode="outlined"
-                                label="Number"
-                                value={enterNumber}
-                                onChangeText={numberInputHandler}
-                            />
-
-
-                        <View style={GameStyles.buttonsView}>
-
-                             <CustomButtom
-                                iconName='check'
-                                text='confirm'
-                                colorName={MyColors.navyBlue}
-                                onPress={confirmInputHandler}
-                            />
-                            <CustomButtom
-                                iconName='sync'
-                                text='reset'
-                                colorName='red'
-                                onPress={resetInputHandler}
-                            /> 
-                             <CustomButtom>Reset</CustomButtom> 
+                        <View>
+                            <Text>Higher or lower?</Text>
+                            <View>
+                                <CustomButtom >+</CustomButtom>
+                                <CustomButtom>  -</CustomButtom>
+                            </View>
                         </View>
+                    </SafeAreaView>
+                </View >
 
-                    </View>
-
-                </View>
-                </TouchableWithoutFeedback>
             </ImageBackground>
         </LinearGradient>
-        
-    );
+
+    )
+
 }
